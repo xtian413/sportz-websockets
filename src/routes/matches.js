@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import {createMatchSchema, MATCH_STATUS, listMatchesQuerySchema } from '../validation/matches.js'
+import {createMatchSchema, listMatchesQuerySchema } from '../validation/matches.js'
 import { matches } from '../db/schema.js'
 import { db } from '../db/db.js'
 import { getMatchStatus } from '../utils/match-status.js'
@@ -19,11 +19,12 @@ matchRouter.get('/', async (req, res) => {
         const data = await db
             .select()
             .from(matches)
-            .orderBy((desc(matches.createdAt)))
+            .orderBy(desc(matches.createdAt))
             .limit(limit)
 
         res.json({data})
     } catch (e) {
+        console.error('Failed to list matches:', e);
         res.status(500).json({ error: 'Failed to list matches '})
     }
 })
@@ -49,6 +50,7 @@ matchRouter.post('/', async (req, res) => {
 
         res.status(201).json({ data: event })
     } catch (e) {
-        res.status(500).json({error: 'Failed to create match.', details: JSON.stringify(e)})
+        console.error('Failed to create match:', e);
+        res.status(500).json({error: 'Failed to create match.'})
     }
 })
